@@ -1,0 +1,38 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const vitest_1 = require("vitest");
+const flush_1 = require("./flush");
+const parser_1 = require("../core/parser");
+(0, vitest_1.describe)("Ticket B1 - Flush detection", () => {
+    (0, vitest_1.it)("detects a flush when there are exactly 5 cards of the same suit", () => {
+        const cards = ["Ah", "Jh", "9h", "6h", "4h"].map(parser_1.parseCard);
+        const res = (0, flush_1.bestFlush)(cards);
+        (0, vitest_1.expect)(res).not.toBeNull();
+        (0, vitest_1.expect)(res.suit).toBe("h");
+        (0, vitest_1.expect)(res.cards.map((c) => [c.rank, c.suit])).toEqual([
+            [14, "h"],
+            [11, "h"],
+            [9, "h"],
+            [6, "h"],
+            [4, "h"],
+        ]);
+    });
+    (0, vitest_1.it)("returns null when there is no flush", () => {
+        const cards = ["Ah", "Jd", "9h", "6s", "4c"].map(parser_1.parseCard);
+        const res = (0, flush_1.bestFlush)(cards);
+        (0, vitest_1.expect)(res).toBeNull();
+    });
+    (0, vitest_1.it)("when more than 5 suited cards exist, returns the best five of that suit", () => {
+        const cards = ["Ah", "Kh", "Jh", "9h", "6h", "4h", "2c"].map(parser_1.parseCard);
+        const res = (0, flush_1.bestFlush)(cards);
+        (0, vitest_1.expect)(res).not.toBeNull();
+        (0, vitest_1.expect)(res.suit).toBe("h");
+        (0, vitest_1.expect)(res.cards.map((c) => [c.rank, c.suit])).toEqual([
+            [14, "h"],
+            [13, "h"],
+            [11, "h"],
+            [9, "h"],
+            [6, "h"],
+        ]);
+    });
+});
