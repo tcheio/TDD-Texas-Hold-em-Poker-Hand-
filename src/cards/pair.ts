@@ -3,6 +3,8 @@ import { Card, Rank } from "./card";
 export enum Category {
   HighCard = 0,
   Pair = 1,
+  TwoPair = 2,
+  ThreeOfAKind = 3,
 }
 
 export interface Hand {
@@ -20,16 +22,30 @@ export function evaluate(cards: readonly Card[]): Hand {
   const sortedCards = [...cards].sort((a, b) => {
     const countA = rankCounts.get(a.rank)!;
     const countB = rankCounts.get(b.rank)!;
+    
+    // Sort by count (descending)
     const countDiff = countB - countA;
     if (countDiff !== 0) return countDiff;
+    
+    // Sort by rank (descending)
     return b.rank - a.rank;
   });
 
   // Determine category
-  // For 5 cards, if we have a pair, the max count is 2.
-  // Note: Two Pair, 3 of a kind etc are not yet handled.
-  const maxCount = Math.max(...rankCounts.values());
-  const category = maxCount === 2 ? Category.Pair : Category.HighCard;
+  const counts = Array.from(rankCounts.values());
+  const maxCount = Math.max(...counts);
+  const pairCount = counts.filter(c => c === 2).length;
+
+  let category = Category.HighCard;
+  if (maxCount === 3) {
+    category = Category.ThreeOfAKind;
+  } else if (maxCount === 2) {
+    if (pairCount === 2) {
+      category = Category.TwoPair;
+    } else {
+      category = Category.Pair;
+    }
+  }
 
   return {
     category,
@@ -42,10 +58,6 @@ export function compare(a: Hand, b: Hand): number {
     return a.category - b.category;
   }
   return compareRankVector(a.cards, b.cards);
-}
-
-function compareRankDesc(a: Card, b: Card): number {
-  return b.rank - a.rank;
 }
 
 function compareRankVector(a: readonly Card[], b: readonly Card[]): number {
