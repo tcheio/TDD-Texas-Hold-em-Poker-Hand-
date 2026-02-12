@@ -4,7 +4,8 @@ import { bestFlush } from "./flush";
 import { bestStraight } from "./straight";
 import { bestFourOfAKind } from "./four";
 import { bestFullHouse } from "./full-house";
-// Note: importing specific detectors if needed, but evaluateRankBased covers Four/Full/Three/Two/Pair/High
+import { bestThreeOfAKind } from "./three";
+import { bestTwoPair } from "./two-pair";
 
 export interface Hand {
   category: Category;
@@ -17,7 +18,6 @@ export function getBestHand(cards: readonly Card[]): Hand {
   const flushRes = bestFlush(cards);
   if (flushRes) {
     // Check for straight using all cards of that suit
-    // We need to re-find all cards of that suit because bestFlush returns top 5
     const suitedCards = cards.filter(c => c.suit === flushRes.suit);
     const straightRes = bestStraight(suitedCards);
     if (straightRes) {
@@ -33,7 +33,7 @@ export function getBestHand(cards: readonly Card[]): Hand {
   if (fourRes) {
       return {
           category: Category.FourOfAKind,
-          cards: fourRes.cards // already 5 cards
+          cards: fourRes.cards
       };
   }
 
@@ -42,7 +42,7 @@ export function getBestHand(cards: readonly Card[]): Hand {
   if (fullRes) {
       return {
           category: Category.FullHouse,
-          cards: fullRes.cards // already 5 cards
+          cards: fullRes.cards
       };
   }
 
@@ -50,7 +50,7 @@ export function getBestHand(cards: readonly Card[]): Hand {
   if (flushRes) {
     return {
       category: Category.Flush,
-      cards: flushRes.cards // already 5 cards
+      cards: flushRes.cards
     };
   }
 
@@ -59,11 +59,29 @@ export function getBestHand(cards: readonly Card[]): Hand {
   if (straightRes) {
     return {
       category: Category.Straight,
-      cards: straightRes.cards // already 5 cards
+      cards: straightRes.cards
     };
   }
 
-  // 6. Rank based (Three, Two, Pair, High)
+  // 6. Check Three of a Kind
+  const threeRes = bestThreeOfAKind(cards);
+  if (threeRes) {
+    return {
+      category: Category.ThreeOfAKind,
+      cards: threeRes.cards
+    };
+  }
+
+  // 7. Check Two Pair
+  const twoPairRes = bestTwoPair(cards);
+  if (twoPairRes) {
+    return {
+      category: Category.TwoPair,
+      cards: twoPairRes.cards
+    };
+  }
+
+  // 8. Rank based (Pair, High Card)
   const rankBased = evaluateRankBased(cards);
   // Truncate to 5 cards
   return {
