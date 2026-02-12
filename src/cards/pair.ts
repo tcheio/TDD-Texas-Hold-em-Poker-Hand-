@@ -5,6 +5,8 @@ export enum Category {
   Pair = 1,
   TwoPair = 2,
   ThreeOfAKind = 3,
+  FullHouse = 4,
+  FourOfAKind = 5,
 }
 
 export interface Hand {
@@ -35,12 +37,24 @@ export function evaluate(cards: readonly Card[]): Hand {
   const counts = Array.from(rankCounts.values());
   const maxCount = Math.max(...counts);
   const pairCount = counts.filter(c => c === 2).length;
+  const tripleCount = counts.filter(c => c === 3).length;
 
   let category = Category.HighCard;
-  if (maxCount === 3) {
-    category = Category.ThreeOfAKind;
+  
+  if (maxCount === 4) {
+    category = Category.FourOfAKind;
+  } else if (maxCount === 3) {
+    // Check for Full House
+    // A full house can be 3 + 2 or 3 + 3 (if 6+ cards, but here we process provided cards)
+    // If we have two triples, one becomes pair -> Full House.
+    // If we have one triple and one pair -> Full House.
+    if (tripleCount >= 2 || pairCount >= 1) {
+      category = Category.FullHouse;
+    } else {
+      category = Category.ThreeOfAKind;
+    }
   } else if (maxCount === 2) {
-    if (pairCount === 2) {
+    if (pairCount >= 2) { // 2 or more pairs
       category = Category.TwoPair;
     } else {
       category = Category.Pair;
