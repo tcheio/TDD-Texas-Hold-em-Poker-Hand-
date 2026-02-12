@@ -1,0 +1,27 @@
+{
+  "name": "tdd-texas-hold-em-poker-hand-",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+      "test": "vitest",
+      "test:run": "vitest run"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tcheio/TDD-Texas-Hold-em-Poker-Hand-.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/tcheio/TDD-Texas-Hold-em-Poker-Hand-/issues"
+  },
+  "homepage": "https://github.com/tcheio/TDD-Texas-Hold-em-Poker-Hand-#readme",
+  "devDependencies": {
+    "@types/node": "^25.2.3",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.18"
+  }
+}
